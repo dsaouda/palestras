@@ -1,0 +1,325 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Monitorando sua aplicação com logs</title>
+
+		<link rel="stylesheet" href="reveal.js-3.5.0/css/reveal.css">
+		<link rel="stylesheet" href="reveal.js-3.5.0/css/theme/white.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="reveal.js-3.5.0/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js-3.5.0/css/print/pdf.css' : 'reveal.js-3.5.0/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">			
+			<div class="slides">				
+				<section>
+					<h2>Monitorando sua aplicação com logs</h2>
+					<p><a href="http://github.com/dsaouda">http://github.com/dsaouda</a></p>
+				</section>
+
+				<section>					
+					<h2>Quem sou eu?</h2>
+
+					<ul>
+						<li>Ciência da computação pela Universidade de Guarulhos</li>
+						<li>MBA Soluções corporativas Java - FIAP</li>
+						<li>Trabalho na Forseti Tecnologia em Licitação</li>
+					</ul>					
+				</section>
+
+				<section>					
+					<h2>Agenda</h2>
+
+					<ul>
+						<li>Introdução</li>
+						<li>Sentry</li>
+						<li>Elastic Stack</li>
+						<li>Resumo de outras ferramentas</li>						
+					</ul>					
+				</section>
+
+				<section>					
+					<h2>Para que preciso de log?</h2>
+				</section>
+
+				<section>
+					<img src="20171209-monitorando-aplicacao-com-logs/caixa-preta.jpg">
+				</section>
+
+				<section>
+					<img src="20171209-monitorando-aplicacao-com-logs/homer.gif">
+				</section>
+
+				<section>					
+					<h2>Geralmente como visualizamos um log?</h2>
+					<p class="fragment">ssh user@server</p>
+					<p class="fragment">tail -f /var/log/*</p>
+
+					<pre class="fragment"><code>
+138.117.63.162 - - [08/Dec/2017:11:00:47 -0200] "POST /sistema/notificacao HTTP/1.1" 200 114 "https://exemplo.com.br/home" "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" "-"
+201.81.5.18 - - [08/Dec/2017:11:00:48 -0200] "POST /sistema/notificacao HTTP/1.1" 200 10753 "https://exemplo.com.br/sistema" "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0" "-"
+179.126.128.202 - - [08/Dec/2017:11:00:48 -0200] "GET /api/portais HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Linux; Android 7.0; Moto G (4) Build/NPJS25.93-14-10; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/62.0.3202.84 Mobile Safari/537.36" "-"
+201.48.147.153 - - [08/Dec/2017:11:00:49 -0200] "GET /sistema/get-chat-mensagens/cliente/2403/mensagem/790652?type=nao-lidas&ultimaMensagem={%22nu_timestamp%22:%222017-12-08%2009:43:54.35097%22,%22dt_comunicado%22:%222017-12-08%2009:41:21%22} HTTP/1.1" 200 258 "https://exemplo.com.br/sistema" "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36" "-"
+138.117.63.162 - - [08/Dec/2017:11:00:49 -0200] "GET /index HTTP/1.1" 200 12204 "https://exemplo.com.br/home" "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" "-"
+191.35.175.75 - - [08/Dec/2017:11:00:50 -0200] "POST /sistema/notificacao HTTP/1.1" 200 114 "https://exemplo.com.br/index" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0" "-"
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Como filtramos uma informação?</h2>
+					<p class="fragment">ssh user@server</p>
+					<p class="fragment">cat /var/log/* | grep '138.117.63.162' </p>
+					<pre class="fragment"><code>
+138.117.63.162 - - [08/Dec/2017:15:32:21 -0200] "POST /sistema/notificacao HTTP/1.1" 200 114 "https://exemplo.com.br/index" "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" "-"
+138.117.63.162 - - [08/Dec/2017:11:00:49 -0200] "GET /index HTTP/1.1" 200 12204 "https://exemplo.com.br/home" "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" "-"
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Como extrair uma informação?</h2>
+					<p class="fragment">ssh user@server</p>
+					<p class="fragment">cat /var/log/* | awk '{print $6, $8, $9, $7}'</p>
+					<pre class="fragment"><code>
+"GET HTTP/1.1" 200 /sistema/get-chat-mensagens/cliente/378/mensagem/791594?type=nao-lidas&ultimaMensagem=
+"GET HTTP/1.1" 200 /sistema/get-chat-licitacao/cliente/378/mensagem/791594
+"GET HTTP/1.1" 301 /
+"GET HTTP/1.1" 200 /
+"GET HTTP/1.1" 200 /sistema/get-chat-licitacao/cliente/534/mensagem/789797
+"POST HTTP/1.1" 200 /sistema/notificacao
+"GET HTTP/1.1" 301 /
+"GET HTTP/1.1" 200 /
+"GET HTTP/1.1" 200 /sistema/get-chat-mensagens/cliente/534/mensagem/789797?type=nao-lidas&ultimaMensagem=
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Problemas</h2>
+
+					<ul>
+						<li class="fragment">Sua empresa tem mais de um servidor?</li>
+						<li class="fragment">Você tem permissão para fazer ssh em produção?</li>
+						<li class="fragment">Você usa container?</li>
+						<li class="fragment">Você só sabe que algo deu errado quando você está analisando os logs</li>
+						<li class="fragment">ou se seu cliente te avisar</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Solução</h2>
+
+					<p class="fragment">Centralize seus logs</p>
+				</section>
+
+				<section>
+					<h2>Ferramentas</h2>
+				</section>
+
+				<section>
+					<img src="20171209-monitorando-aplicacao-com-logs/docker.png" style="background:none; border:none; box-shadow:none;">
+					https://docs.docker.com/engine/installation/
+				</section>
+
+				<section>
+					<h1>PHP + Monolog</h1>
+
+					composer require monolog/monolog
+				</section>
+
+				<section>
+					<h1>Sentry</h1>
+
+					<a href="https://sentry.io/welcome/">https://sentry.io/welcome/</a>
+					<br><a href="https://hub.docker.com/_/sentry/">https://hub.docker.com/_/sentry/</a>					
+				</section>				
+
+				<section>
+					<h2>Elastic Stack</h2>
+
+					<a href="https://www.elastic.co/products">https://www.elastic.co/products</a>
+
+					<pre><code>---
+version: '3.0'
+services:
+  logstash:
+    image: docker.elastic.co/logstash/logstash:6.0.1    
+    volumes:
+      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
+    networks:
+      - elastic-stack    
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.1
+    networks:
+      - elastic-stack
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.0.1    
+    ports: [ '5601:5601' ]
+    networks:
+      - elastic-stack   
+
+  filebeat: 
+    image: docker.elastic.co/beats/filebeat:6.0.1    
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat/log:/mnt/log/
+      - ./filebeat/prospectors.d/:/usr/share/filebeat/prospectors.d/
+    networks:
+      - elastic-stack
+    
+networks:
+  elastic-stack:
+					</code></pre>
+
+					docker-compose up -d
+				</section>
+
+				<section>
+					<h2>Sentry</h2>
+					error tracking					
+				</section>
+
+				<section>
+					<h2>Demo</h2>
+				</section>
+
+				<section>
+					<h2>Elastic Stack</h2>
+					Obtenha dados confiáveis e seguros de qualquer fonte, em qualquer formato e
+procure, analise e visualize em tempo real.
+				</section>
+
+				<section>
+					<h1>Stack</h1>
+					<ul>
+						<li class="fragment"><a href="https://www.elastic.co/products/beats/filebeat">filebeat</a></li>
+						<li class="fragment"><a href="https://www.elastic.co/products/logstash">logstash</a></li>						
+						<li class="fragment"><a href="https://www.elastic.co/products/elasticsearch">elasticsearch</a></li>
+						<li class="fragment"><a href="https://www.elastic.co/products/kibana">kibana</a></li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>logstash</h2>
+					<ul>
+						<li><a href="https://www.elastic.co/guide/en/logstash/current/input-plugins.html">input</a></li>
+						<li><a href="https://www.elastic.co/guide/en/logstash/current/filter-plugins.html">filter</a></li>
+						<li><a href="https://www.elastic.co/guide/en/logstash/current/output-plugins.html">output</a></li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>input</h2>
+					<img src="20171209-monitorando-aplicacao-com-logs/logstash-input.png">
+				</section>
+
+				<section>
+					<h2>filter</h2>
+					<img src="20171209-monitorando-aplicacao-com-logs/logstash-filter.png">
+				</section>
+
+				<section>
+					<h2>output</h2>
+					<img src="20171209-monitorando-aplicacao-com-logs/logstash-output.png">
+				</section>
+
+				<section>
+					<img src="20171209-monitorando-aplicacao-com-logs/elastic-stack.png">
+					<small>https://www.packtpub.com/sites/default/files/Article-Images/B05556_01_2.png</small>
+				</section>
+
+				<section>
+					<h2>Demo</h2>
+				</section>
+
+				<section>
+					<h2>Alternativas SaaS</h2>
+					
+					<ul>
+						<li><a href="https://www.loggly.com/">Loggly</a></li>
+						<li><a href="https://rollbar.com/">Rollbar</a></li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Outras formas de monitorar aplicação / negócio</h2>
+				</section>
+
+				<section>
+					<h2>Como sua aplicação está sendo usada</h2>
+
+					<ul>
+						<li><a href="https://www.google.com/analytics/">Google Analytics</a></li>
+						<li><a href="https://amplitude.com/">Amplitude</a></li>
+						<li><a href="https://www.hotjar.com/">Hotjar</a></li>						
+					</ul>
+				</section>
+
+				<section>
+					<h2>Infra (e outras coisas)</h2>
+					
+					<ul>
+						<li><a href="https://www.zabbix.com/">Zabbix</a></li>
+						<li><a href="https://www.nagios.org/">Nagios</a></li>
+						<li><a href="https://www.icinga.com/">Icinga</a></li>
+						<li><a href="https://prometheus.io/">Prometheus</a></li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>all-in-one</h2>
+					
+					<ul>
+						<li><a href="https://newrelic.com/">New Relic</a></li>
+						<li><a href="https://www.datadoghq.com/">Data Dog</a></li>
+						<li><a href="https://www.dynatrace.com/">Dynatrace</a></li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Obrigado!</h2>
+					<img src="20171209-monitorando-aplicacao-com-logs/qrcode.png" style="background:none; border:none; box-shadow:none;">
+					<p><a href="http://github.com/dsaouda">http://github.com/dsaouda</a></p>
+					<p><a href="https://www.linkedin.com/in/diegosaouda/">https://www.linkedin.com/in/diegosaouda/</a></p>            		
+
+				</section>
+
+			</div>
+		</div>
+
+		<script src="reveal.js-3.5.0/lib/js/head.min.js"></script>
+		<script src="reveal.js-3.5.0/js/reveal.js"></script>
+
+		<script>
+			
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				transition: 'slide',
+				showNotes: false,
+
+				dependencies: [
+					{ src: 'reveal.js-3.5.0/plugin/markdown/marked.js' },
+					{ src: 'reveal.js-3.5.0/plugin/markdown/markdown.js' },
+					{ src: 'reveal.js-3.5.0/plugin/notes/notes.js', async: true },
+					{ src: 'reveal.js-3.5.0/plugin/zoom-js/zoom.js', async: true },
+					{ src: 'reveal.js-3.5.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>

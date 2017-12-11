@@ -1,0 +1,403 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Monitorando sua aplicação com logs</title>
+
+		<link rel="stylesheet" href="reveal.js-3.5.0/css/reveal.css">
+		<link rel="stylesheet" href="reveal.js-3.5.0/css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="reveal.js-3.5.0/lib/css/zenburn.css">
+
+		<style type="text/css">
+			.referencia { font-size: 0.5em!important; display: block; }
+		</style>
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js-3.5.0/css/print/pdf.css' : 'reveal.js-3.5.0/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">			
+			<div class="slides">				
+				<section>
+					<img src="20171207-graphql-com-php/graphql-php.png">
+					<p>
+                		<small>
+                    		<a href="https://www.linkedin.com/in/diegosaouda/">Diego Saouda</a> /
+                    		<a href="http://github.com/dsaouda">github</a>
+                		</small>
+            		</p>
+
+					<!--<img src="https://hsto.org/web/0bc/8d1/715/0bc8d171582548d690cb776d7fb2ae8c.png" />-->
+				</section>
+
+				<section data-markdown>
+						<textarea data-template>
+							## O que será abordado?
+
+							 - Introdução ao GraphQL
+							 - Alguns exemplos
+							 - Utilização em PHP 
+						</textarea>
+				</section>
+
+				<section>					
+					<h2>Quem sou eu?</h2>
+					<ul>
+						<li class="fragment">Ciência da computação pela Universidade de Guarulhos</li>
+						<li class="fragment">MBA Soluções corporativas Java - FIAP</li>
+						<li class="fragment">Trabalho na Forseti Tecnologia em Licitação</li>
+					</ul>					
+				</section>
+
+				<section>					
+					<h2>Não podemos falar de GraphQL sem falar de REST</h2>					
+					<p class="fragment"><img src="20171207-graphql-com-php/rest-brincadeira.png" /></p>	
+					<p class="fragment">
+						Calma é só uma brincadeira<br>
+						<img src="20171207-graphql-com-php/peguei-voces.gif" />
+					</p>	
+					
+				</section>
+
+				<section>					
+					<h2>Rest</h2>
+
+					request (GET)
+					<pre><code data-trim data-noescape>
+					https://viacep.com.br/ws/01001000/json/
+					</code></pre>
+
+					response
+					<pre><code data-trim data-noescape>
+					{
+					  "cep": "01001-000",
+					  "logradouro": "Praça da Sé",
+					  "complemento": "lado ímpar",
+					  "bairro": "Sé",
+					  "localidade": "São Paulo",
+					  "uf": "SP",
+					  "unidade": "",
+					  "ibge": "3550308",
+					  "gia": "1004"
+					}
+					</code></pre>
+					
+				</section>
+
+				<section>					
+					<h2>GraphQL</h2>
+
+					request (POST)
+					<pre><code data-trim data-noescape>
+					{
+					  endereco(cep: "01001-000") {
+					    logradouro
+					    uf
+					  }
+					}
+					</code></pre>
+
+					response
+					<pre><code data-trim data-noescape>					
+					{
+					  "data": {
+					    "endereco": {
+					      "logradouro": "Praça da Sé",
+					      "uf": "SP"
+					    }
+					  }
+					}
+					</code></pre>
+					
+				</section>
+
+				<section>
+					<h2>Introdução</h2>
+
+					De forma resumida
+
+					<blockquote>
+					"GraphQL é uma linguagem de consulta para sua API ..."
+					</blockquote>
+
+					<span class="referencia">http://graphql.org</span>
+
+				</section>	
+
+				<section>
+					
+					<img src="20171207-graphql-com-php/graphql.png" />
+
+				</section>	
+
+				<section>					
+					<h2>1 endpoint</h2>
+					<img src="20171207-graphql-com-php/rest-vs-graphql.png" />
+					
+					<span class="referencia">https://cdn-images-1.medium.com/max/800/1*qpyJSVVPkd5c6ItMmivnYg.png</span>
+				</section>
+
+				<section>
+					<section>
+						<h2>Queries and Mutations</h2>
+					</section>					
+
+					<section>
+						<h2>Fields</h2>
+						<img src="20171207-graphql-com-php/fields.png">
+					</section>
+
+					<section>
+						<h2>Arguments</h2>
+						<img src="20171207-graphql-com-php/arguments.png">
+					</section>
+
+					<section>
+						<h2>Alias</h2>
+						<img src="20171207-graphql-com-php/alias.png">
+					</section>
+
+					<section>
+						<h2>Fragments</h2>
+						<img src="20171207-graphql-com-php/fragments.png">
+					</section>
+
+					<section>
+						<h2>Variables</h2>
+						<img src="20171207-graphql-com-php/variable.png">
+					</section>
+
+					<section>
+						<h2>Directives</h2>
+						<img src="20171207-graphql-com-php/directives.png">
+					</section>
+
+					<section>
+						<h2>Mutations</h2>
+						<img src="20171207-graphql-com-php/mutation.png">
+					</section>
+
+				</section>
+
+				<section>
+					<section>
+						<h2>Schemas and Types</h2>
+					</section>
+
+					<section>
+						composer require webonyx/graphql-php
+					</section>
+
+					<section>
+						<pre><code data-trim data-noescape>
+						$schema = new Schema([
+					        'query' => $queryType,
+					        'mutation' => $mutationType,
+					    ]);</code></pre>
+
+						<span class="referencia">http://webonyx.github.io/graphql-php/type-system/schema/#configuration-options</span>
+					</section>
+
+					<section>
+						<pre><code data-trim data-noescape>
+						$queryType = new ObjectType([
+					        'name' => 'Query',
+					        'fields' => [
+					            'echo' => [
+					                'type' => Type::string(),
+					                'args' => [
+					                    'message' => ['type' => Type::string()],
+					                ],
+					                'resolve' => function ($root, $args) {
+					                    return $root['prefix'] . $args['message'];
+					                }
+					            ],
+					        ],
+					    ]);					    
+						</code></pre>
+					</section>
+
+					<section>
+						<pre><code data-trim data-noescape>
+						$mutationType = new ObjectType([
+					        'name' => 'Calc',
+					        'fields' => [
+					            'sum' => [
+					                'type' => Type::int(),
+					                'args' => [
+					                    'x' => ['type' => Type::int()],
+					                    'y' => ['type' => Type::int()],
+					                ],
+					                'resolve' => function ($root, $args) {
+					                    return $args['x'] + $args['y'];
+					                },
+					            ],
+					        ],
+					    ]);
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Types</h2>
+						<ul>
+							<li>Int</li>
+							<li>Float</li>
+							<li>String</li>
+							<li>Boolean</li>
+							<li>ID</li>
+							<li>Object</li>
+							<li>Enum</li>
+						</ul>
+					</section>
+
+					<section>
+						<h2>type modifiers</h2>
+						<ul>
+							<li>List</li>
+							<li>Non-Null</li>							
+						</ul>
+
+						<pre><code data-trim data-noescape>
+						type Character {
+						  name: String!
+						  appearsIn: [Episode]!
+						}
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>resolvers</h2>
+						
+						<pre><code data-trim data-noescape>
+						'resolve' => function ($root, $args) {
+					    	return $args['x'] + $args['y'];
+					    },
+						</code></pre>
+					</section>
+
+				</section>
+
+				
+				<section>
+					<h2>Validation</h2>
+					<img src="20171207-graphql-com-php/validation.png">
+				</section>
+
+				<section>
+					<h2>Introspection</h2>
+					
+					<blockquote>Muitas vezes é útil pedir um esquema GraphQL para obter informações sobre quais consultas ele suporta. O GraphQL nos permite fazer isso usando o sistema de introspecção!</blockquote>
+
+					API documentada :) 
+
+				</section>
+
+				<section>
+					<section>
+							<h2>Vamos brincar um pouco</h2>
+
+							https://github.com/APIs-guru/graphql-apis
+					</section>
+
+					<section>						
+
+						<iframe width="800" height="500" src="https://graphql-pokemon.now.sh/?query=query(%24id1%3AString%2C%20%24id2%3A%20String)%20%7B%0A%20%20p1%3A%20pokemon(id%3A%20%24id1)%20%7B%0A%20%20%20%20...poke%0A%20%20%7D%0A%20%20%0A%20%20p2%3A%20pokemon(id%3A%20%24id2)%20%7B%0A%20%20%20%20...poke%0A%20%20%7D%0A%20%20%0A%20%20lista%3Apokemons(first%3A%20100)%20%7B%0A%20%20%20%20...poke%0A%20%20%7D%0A%7D%0A%0Afragment%20poke%20on%20Pokemon%20%7B%0A%20%20id%0A%20%20name%0A%20%20number%20%20%0A%7D&variables=%7B%0A%20%20%22id1%22%3A%20%22UG9rZW1vbjowMTc%3D%22%2C%0A%20%20%22id2%22%3A%20%22UG9rZW1vbjowMDQ%3D%22%0A%7D"></iframe>						
+
+						<a href="https://graphql-pokemon.now.sh/?query=query%20%7B%0A%20%20pokemons(first%3A%20100)%20%7B%0A%20%20%20%20number%2C%0A%20%20%20%20name%0A%20%20%7D%0A%7D%0A%0A">
+							https://graphql-pokemon.now.sh
+						</a>
+					</section>
+
+					<section>							
+							https://graphloc.com/
+					</section>
+
+					<section>							
+						https://developer.github.com/v4/explorer/
+					</section>
+				</section>
+
+				<section>					
+					<h2>Quero ver PHP!!!</h2>
+
+					https://github.com/dsaouda/graphql-phpconf-2017
+				</section>
+
+				<section>
+					<h2>client-side</h2>
+
+
+
+					http://graphql.org/code/#graphql-clients
+				</section>
+
+				<section>
+					<h2>Ferramentas</h2>
+
+					<ul>
+						<li>https://github.com/graphql/graphiql</li>
+						<li>http://graphql.org/code/#tools</li>
+						<li>chrome-extension://fkkiamalmpiidkljmicmjfbieiclmeij/chromeiql.html</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Quem usa?</h2>					
+
+					http://graphql.org/users/
+				</section>
+
+				<section>
+					<h2>Referências</h2>
+
+					<ul>
+						<li>http://graphql.org/</li>
+						<li>http://graphql.org/learn/</li>
+						<li>https://developer.github.com/v4/explorer/</li>
+						<li>https://pt.slideshare.net/brunonm/do-rest-ao-graphql-com-php</li>
+						<li>https://pt-br.eventials.com/locaweb/do-rest-ao-graphql-com-php-com-bruno-neves-menezes/</li>
+						<li>https://labs.getninjas.com.br/tagged/graphql</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Obrigado!</h2>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="reveal.js-3.5.0/lib/js/head.min.js"></script>
+		<script src="reveal.js-3.5.0/js/reveal.js"></script>
+
+		<script>
+			
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				transition: 'convex',
+				showNotes: false,
+
+				dependencies: [
+					{ src: 'reveal.js-3.5.0/plugin/markdown/marked.js' },
+					{ src: 'reveal.js-3.5.0/plugin/markdown/markdown.js' },
+					{ src: 'reveal.js-3.5.0/plugin/notes/notes.js', async: true },
+					{ src: 'reveal.js-3.5.0/plugin/zoom-js/zoom.js', async: true },
+					{ src: 'reveal.js-3.5.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
